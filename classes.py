@@ -5,9 +5,12 @@ class DailyRealData:
         self.cases_7_average = cases_7_average
         self.cases_14_average = cases_14_average
         self.total_cases = total_cases
+        
     def to_dict(self):
-            return {"date": self.date,
-                    "newcases": self.new_cases,
-                    "cases_7_average": self.cases_7_average,
-                    "cases_14_average": self.cases_14_average,
-                    "total_cases": self.total_cases}
+        return {
+            "date": self.date,
+            "newcases": self.new_cases,
+            "cases_7_average": self.cases_7_average,
+            "cases_14_average": self.cases_14_average,
+            "total_cases": self.total_cases
+        }
