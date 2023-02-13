@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import os
 
 app = Flask(__name__)
+
 CORS(app,resources={r"/*": {"origins": "*"}})
 
 load_dotenv()
@@ -14,12 +15,10 @@ load_dotenv()
 pw = os.getenv("PASSWORD")
 usr = os.getenv("USERNAME")
 
-
 username = urllib.parse.quote_plus(usr)
 password = urllib.parse.quote_plus(pw)
 
-client = pymongo.MongoClient("mongodb://" + username + ":" + password +
-                             "@covlab.tech:57017/TwitterVisual")
+client = pymongo.MongoClient("mongodb://" + username + ":" + password + "@covlab.tech:57017/TwitterVisual")
 
 @app.route('/')
 # ‘/’ URL is bound with hello_world() function.
@@ -29,8 +28,6 @@ def hello_world():
 
 @app.route('/graphData')
 def grabGraphData():
-
-
     db = client["TwitterVisual"]
     daily_real_data_us_collection = db["daily_real_data_us"]
     new_cases_data = daily_real_data_us_collection.find()
@@ -82,7 +79,7 @@ def grabGraphData():
     new_cases_data = daily_positive_tweet_count_collection.find()
 
     for data in new_cases_data:
-            print(data)
+        print(data)
 
     dataObj = [dataArr,tweetArr]
 
