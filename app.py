@@ -88,13 +88,6 @@ def grabGraphData():
     #json data is  not serializeable
     return json.dumps(dataObj)
  
-@cross_origin()
-@app.route('/address/', methods=['GET'])
-def main():
-    data = request.args.to_dict()
-    res = wrapper(data)
-    print(res)
-    return jsonify({'sales': res[0],'revenue':res[1],'revenueInUSD':res[2][0],'gasSpentUSD':res[2][1]})
 
 if __name__ == '__main__':
     app.run()
