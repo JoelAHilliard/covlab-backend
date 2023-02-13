@@ -15,8 +15,8 @@ load_dotenv()
 pw = os.getenv("PASSWORD")
 usr = os.getenv("USERNAME")
 
-username = urllib.parse.quote_plus(usr)
-password = urllib.parse.quote_plus(pw)
+username = urllib.parse.quote_plus(str(usr))
+password = urllib.parse.quote_plus(str(pw))
 
 client = pymongo.MongoClient("mongodb://" + username + ":" + password + "@covlab.tech:57017/TwitterVisual")
 
