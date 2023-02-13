@@ -1,14 +1,16 @@
-from flask import Flask
-import pymongo
-import urllib.parse
+
 import json
-from flask_cors import CORS
-from dotenv import load_dotenv
 import os
 
+from dotenv import load_dotenv
+import pymongo
+import urllib.parse
+from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 app = Flask(__name__)
+CORS(app)
 
-CORS(app,resources={r"/*": {"origins": "*"}})
+
 
 load_dotenv()
 
@@ -20,12 +22,12 @@ password = urllib.parse.quote_plus(str(pw))
 
 client = pymongo.MongoClient("mongodb://" + username + ":" + password + "@covlab.tech:57017/TwitterVisual")
 
-@app.route('/')
-# ‘/’ URL is bound with hello_world() function.
-def hello_world():
-    return 'Covlab API'
 
 
+@cross_origin()
+@app.route('/', methods=['GET'])
+def home():
+    return "<h1>Consensus Tax</h1>"
 @app.route('/graphData')
 def grabGraphData():
     db = client["TwitterVisual"]
@@ -86,11 +88,14 @@ def grabGraphData():
     #json data is  not serializeable
     return json.dumps(dataObj)
  
-# main driver function
+@cross_origin()
+@app.route('/address/', methods=['GET'])
+def main():
+    data = request.args.to_dict()
+    res = wrapper(data)
+    print(res)
+    return jsonify({'sales': res[0],'revenue':res[1],'revenueInUSD':res[2][0],'gasSpentUSD':res[2][1]})
+
 if __name__ == '__main__':
- 
     app.run()
-
-
-
     
