@@ -27,7 +27,7 @@ client = pymongo.MongoClient("mongodb://" + username + ":" + password + "@covlab
 @cross_origin()
 @app.route('/', methods=['GET'])
 def home():
-    return "<h1>Consensus Tax</h1>"
+    return "<h1>Covlab</h1>"
 @app.route('/graphData')
 def grabGraphData():
     db = client["TwitterVisual"]
