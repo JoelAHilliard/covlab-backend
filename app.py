@@ -88,7 +88,7 @@ def grabGraphData():
             "tweets_14_average": data['cases_14_average'],
             "total_tweets": data['total_tweets_count'],
             "positive_tweets_ratio":data['positive_tweets_ratio'],
-            "weekly_new_cases_per1k":data['weekly_new_cases_per1k']
+            "weekly_new_cases_per10m":data['weekly_new_cases_per10m']
         })
 
     tweetArr.sort(key=lambda x: x["date"])
@@ -151,10 +151,8 @@ def getTableData():
     for item in latestDailyPositiveTweetsCount:
         us14DayGraphData['labels'].append(item['date'])
         us14DayGraphData['data'].append([item['date'],item['cases_14_average']])
-
         count+=1
         if count == 14:
-            print(us14DayGraphData['data'])
             break
 
     # Process data for state table
@@ -164,7 +162,6 @@ def getTableData():
         stateData = {"state": item['type']}
         # Update the state data with the matching data from US map, using the state value
         matching_data = next((x["data"] for x in usDataArr if x["state"] == stateData["state"]), [])
-        print(matching_data)
         stateData['cases_14_days_change'] = {
             "percentage": item.get('cases_14_days_change', 'N/A'),
             "14DayData": {
@@ -175,9 +172,8 @@ def getTableData():
                 "data": us14DayGraphData['data']
             }
         }
-        print(us14DayGraphData)
-        stateData['weekly_new_cases_per1k'] = item.get('weekly_new_cases_per1k',
-                                                       latestDailyPositiveTweetsCount[0]['weekly_new_cases_per1k'] if counter == 0 else 'N/A')
+        stateData['weekly_new_cases_per10m'] = item.get('weekly_new_cases_per10m',
+                                                       latestDailyPositiveTweetsCount[0]['weekly_new_cases_per10m'] if counter == 0 else 'N/A')
         stateData['cases_7_sum'] = item.get('cases_7_sum', 'N/A')
         stateData['positivity'] = item.get('positivity', 'N/A')
         
