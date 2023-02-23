@@ -47,7 +47,6 @@ def latest():
 
     return json.dumps(latestData)
 
-
 @app.route('/graphData')
 def grabGraphData():
     db = client["TwitterVisual"]
@@ -128,66 +127,54 @@ def grabGraphData():
 def getTableData():
     db = client["TwitterVisual"]
     statistics_collection = db["statistics"]
-    daily_positive_tweets_count = db["daily_positive_tweets_count"]
-    latestDailyPositiveTweetsCount = list(daily_positive_tweets_count.find().sort(
-    "_id", pymongo.DESCENDING).limit(14))
-    latestStatisticsData = statistics_collection.find()
-    stateArr = []
-
+    daily_positive_tweets_count_collection = db["daily_positive_tweets_count"]
+    usMap = db["us_map"]
+    
+    # Process data for US map
+    usDataArr = []
+    for item in usMap.find().sort([("_id", pymongo.DESCENDING)]):
+        temp_state_item = {"data": []}
+        for key, value in item.items():
+            if key == 'state':
+                temp_state_item['state'] = value
+            elif key not in ["_id", "state", "total_count"]:
+                temp_state_item['data'].append((key, value))
+        temp_state_item['data'] = sorted(temp_state_item['data'], key=lambda x: x[0], reverse=True)[:14]
+        temp_state_item['data'] = list(reversed(list(temp_state_item['data'])))
+        usDataArr.append(temp_state_item)
+    
+    # Process data for 14-day graph
+    latestDailyPositiveTweetsCount = list(daily_positive_tweets_count_collection.find().sort(
+        "_id", pymongo.DESCENDING).limit(14))
     us14DayGraphData = {"labels": [], "data": []}
-
     for item in latestDailyPositiveTweetsCount:
         us14DayGraphData['labels'].append(item['date'])
         us14DayGraphData['data'].append(item['cases_14_average'])
 
-    counter = 0
-    for item in latestStatisticsData:
+    # Process data for state table
+    latestStatisticsData = statistics_collection.find()
+    stateArr = []
+    for counter, item in enumerate(latestStatisticsData):
         stateData = {"state": item['type']}
-        if (counter == 0):
-            stateData['weekly_new_cases_per1k'] = latestDailyPositiveTweetsCount[0][
-            'weekly_new_cases_per1k']
-        if ("weekly_new_cases_per1k" in item):
-            stateData['weekly_new_cases_per1k'] = item['weekly_new_cases_per1k']
-        elif "weekly_new_cases_per1k" not in item and counter != 0:
-            stateData['weekly_new_cases_per1k'] = "N/A"
-        if ('cases_14_days_change' in item):
-            # assumes US Entry is first
-            if (counter == 0):
-                stateData['cases_14_days_change'] = {
-                    "percentage": item['cases_14_days_change'],
-                    "14DayData": us14DayGraphData
-                }
-            else:
-                # print(latestDailyPositiveTweetsCount[counter])
-                if("cases_14_days_change" in item):
-                    stateData['cases_14_days_change'] = {
-                        "percentage": item['cases_14_days_change'],
-                        "14DayData": {
-                        "labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                        "data": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-                        }
-                    }
-                else:
-                    stateData['cases_14_days_change'] = {
-                        "percentage": "N/A",
-                        "14DayData": {
-                        "labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-                        "data": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
-                    }
-                    }
-
-        else:
-            stateData['cases_14_days_change'] = "N/A"
-        if ("cases_7_sum" in item):
-            stateData['cases_7_sum'] = item['cases_7_sum']
-        else:
-            stateData['cases_7_sum'] = "N/A"
-        if ("positivity" in item):
-            stateData['positivity'] = item['positivity']
-
+        # Update the state data with the matching data from US map
+        matching_data = next((x["data"] for x in usDataArr if x["state"] == stateData["state"]), [])
+        stateData['cases_14_days_change'] = {
+            "percentage": item.get('cases_14_days_change', 'N/A'),
+            "14DayData": {
+                "labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                "data": matching_data
+            } if counter > 0 else {
+                "percentage": item.get('cases_14_days_change', 'N/A'),
+                "14DayData": us14DayGraphData
+            }
+        }
+        stateData['weekly_new_cases_per1k'] = item.get('weekly_new_cases_per1k',
+                                                       latestDailyPositiveTweetsCount[0]['weekly_new_cases_per1k'] if counter == 0 else 'N/A')
+        stateData['cases_7_sum'] = item.get('cases_7_sum', 'N/A')
+        stateData['positivity'] = item.get('positivity', 'N/A')
+        
         stateArr.append(stateData)
-
-        counter += 1
+    
     return json.dumps(stateArr)
 
 if __name__ == '__main__':
