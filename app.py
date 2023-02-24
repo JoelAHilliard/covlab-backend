@@ -169,7 +169,7 @@ def getTableData():
                 "data": matching_data
             } if counter > 0 else {
                 "labels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
-                "data": us14DayGraphData['data']
+                "data": us14DayGraphData['data'] 
             }
         }
         stateData['weekly_new_cases_per10m'] = item.get('weekly_new_cases_per10m',
