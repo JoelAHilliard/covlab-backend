@@ -133,7 +133,6 @@ def grabGraphData1():
 
     dataArr = []
     for data in new_cases_data:
-        print(data)
         counter += 1
 
         dataArr.append({
@@ -143,7 +142,9 @@ def grabGraphData1():
             "tweets_14_average": data['tweets_14_average'],
             "tweets_7_average": data['tweets_7_average']
         })
-    return json.dumps(dataArr)
+    sorted_dataArr = sorted(dataArr, key=lambda x: x["date"])
+
+    return json.dumps(sorted_dataArr)
 
 @app.route('/tableData')
 def getTableData():
