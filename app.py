@@ -155,7 +155,7 @@ def getTableData():
         if count == 14:
             break
 
-    # Process data for state table
+    # Process data for state table 
     latestStatisticsData = statistics_collection.find()
     stateArr = []
     for counter, item in enumerate(latestStatisticsData):
