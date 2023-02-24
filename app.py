@@ -123,6 +123,28 @@ def grabGraphData():
     #json data is  not serializeable
     return json.dumps(dataObj)
  
+@app.route('/graphData1')
+def grabGraphData1():
+
+    db = client["TwitterVisual"]
+    daily_real_data_us_collection = db["daily_all_tweets_count"]
+    new_cases_data = daily_real_data_us_collection.find()
+    counter = 0
+
+    dataArr = []
+    for data in new_cases_data:
+        print(data)
+        counter += 1
+
+        dataArr.append({
+            "date": data['date'],
+            "new_tweets_count": data['new_tweets_count'],
+            "total_tweets_count": data['total_tweets_count'],
+            "tweets_14_average": data['tweets_14_average'],
+            "tweets_7_average": data['tweets_7_average']
+        })
+    return json.dumps(dataArr)
+
 @app.route('/tableData')
 def getTableData():
     db = client["TwitterVisual"]
