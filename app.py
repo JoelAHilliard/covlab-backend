@@ -204,6 +204,37 @@ def getTableData():
 
     return json.dumps(stateArr)
 
+@app.route('/mapData')
+def getMapData():
+    db = client["TwitterVisual"]
+    usd_map_collection = db["us_map"]
+    map_data = usd_map_collection.find()
+    stateDataArr = []
+    for item in map_data:
+        state_data = {
+            "state":item['state'],
+            "total_count":item['total_count']
+        }
+        stateDataArr.append(state_data)
+    return json.dumps(stateDataArr)
+
+@app.route('/wordCloudData')
+def getWordCloudData():
+    db = client["TwitterVisual"]
+    word_cloud_collection = db["word_cloud"]
+    word_data = word_cloud_collection.find()
+    wordDataArr = []
+    for item in word_data:
+        print(item)
+        word_data = {
+            "word":item['word'],
+            "frequency":item['frequency']
+        }
+        wordDataArr.append(word_data)
+    return json.dumps(wordDataArr)
+
+    return
+
 if __name__ == '__main__':
     app.run(port=5001)
     
