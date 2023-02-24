@@ -213,7 +213,7 @@ def getMapData():
     for item in map_data:
         state_data = {
             "state":item['state'],
-            "total_count":item['total_count']
+            "positive":item['total_count']
         }
         stateDataArr.append(state_data)
     return json.dumps(stateDataArr)
