@@ -55,9 +55,14 @@ def grabGraphData():
     counter = 0
 
     dataArr = []
+
+    
+
     for data in new_cases_data:
         counter += 1
 
+        
+    
         dataArr.append({
             "date": data['date'],
             "new_cases": data['new_cases'],
@@ -80,16 +85,20 @@ def grabGraphData():
     for data in new_cases_data:
         counter += 1
 
-
-        tweetArr.append({
-            "date": data['date'],
-            "new_tweets": data['new_tweets_count'],
-            "tweets_7_average": data['cases_7_average'],
-            "tweets_14_average": data['cases_14_average'],
-            "total_tweets": data['total_tweets_count'],
-            "positive_tweets_ratio":data['positive_tweets_ratio'],
-            "weekly_new_cases_per10m":data['weekly_new_cases_per10m']
-        })
+        #some db entries are missing some key pairs
+        try:
+            tweetArr.append({
+                "date": data['date'],
+                "new_tweets": data['new_tweets_count'],
+                "tweets_7_average": data['cases_7_average'],
+                "tweets_14_average": data['cases_14_average'],
+                "total_tweets": data['total_tweets_count'],
+                "positive_tweets_ratio":data['positive_tweets_ratio'],
+                "weekly_new_cases_per10m":data['weekly_new_cases_per10m']
+            })
+        except:
+            print("Keyerror finding cases_7_average in grabGraphData:")
+            # print(data)
 
     tweetArr.sort(key=lambda x: x["date"])
 
@@ -133,15 +142,24 @@ def grabGraphData1():
 
     dataArr = []
     for data in new_cases_data:
+        
         counter += 1
 
-        dataArr.append({
-            "date": data['date'],
-            "new_tweets_count": data['new_tweets_count'],
-            "total_tweets_count": data['total_tweets_count'],
-            "tweets_14_average": data['tweets_14_average'],
-            "tweets_7_average": data['tweets_7_average']
-        })
+        #some db entries are missing some key pairs
+
+        try:
+            dataArr.append({
+                "date": data['date'],
+                "new_tweets_count": data['new_tweets_count'],
+                "total_tweets_count": data['total_tweets_count'],
+                "tweets_14_average": data['tweets_14_average'],
+                "tweets_7_average": data['tweets_7_average']
+            })
+        except:
+            print("Keyerror finding cases_7_average in:")
+            # print(data)
+
+
     sorted_dataArr = sorted(dataArr, key=lambda x: x["date"])
 
     return json.dumps(sorted_dataArr)
@@ -153,7 +171,7 @@ def getTableData():
     daily_positive_tweets_count_collection = db["daily_positive_tweets_count"]
     usMapCollection = db["us_map"]
     
-    # Process data for US map
+    # Process data for US map collection
     usDataArr = []
     for item in usMapCollection.find().sort([("_id", pymongo.DESCENDING)]):
         temp_state_item = {"data": []}
@@ -172,9 +190,14 @@ def getTableData():
     us14DayGraphData = {"labels": [], "data": []}
     count = 0
     for item in latestDailyPositiveTweetsCount:
-        us14DayGraphData['labels'].append(item['date'])
-        us14DayGraphData['data'].append([item['date'],item['cases_14_average']])
-        count+=1
+        #some entries have less data or are missing important key pairs
+        try:
+            us14DayGraphData['labels'].append(item['date'])
+            us14DayGraphData['data'].append([item['date'],item['cases_14_average']])
+            count+=1
+        except:
+            print("Issue at GRABTABLEDATA, missing key value 'cases_14_average'")
+            # print(item)
         if count == 14:
             break
 
@@ -195,11 +218,14 @@ def getTableData():
                 "data": us14DayGraphData['data'] 
             }
         }
-        stateData['weekly_new_cases_per10m'] = item.get('weekly_new_cases_per10m',
-                                                       latestDailyPositiveTweetsCount[0]['weekly_new_cases_per10m'] if counter == 0 else 'N/A')
+        
+
+        #US Data is missing some entries
+        # try:
+        stateData['weekly_new_cases_per10m'] = item.get('weekly_new_cases_per10m','N/A')
         stateData['cases_7_sum'] = item.get('cases_7_sum', 'N/A')
         stateData['positivity'] = item.get('positivity', 'N/A')
-        
+        # except:
         stateArr.append(stateData)
 
     return json.dumps(stateArr)
@@ -225,7 +251,6 @@ def getWordCloudData():
     word_data = word_cloud_collection.find()
     wordDataArr = []
     for item in word_data:
-        print(item)
         word_data = {
             "word":item['word'],
             "frequency":item['frequency']
