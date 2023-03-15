@@ -252,8 +252,8 @@ def getWordCloudData():
     wordDataArr = []
     for item in word_data:
         word_data = {
-            "word":item['word'],
-            "frequency":item['frequency']
+            "name":item['word'],
+            "weight":item['frequency']
         }
         wordDataArr.append(word_data)
     return json.dumps(wordDataArr)
