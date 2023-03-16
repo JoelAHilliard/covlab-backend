@@ -222,7 +222,8 @@ def getTableData():
 
         #US Data is missing some entries
         # try:
-        stateData['weekly_new_cases_per10m'] = item.get('weekly_new_cases_per10m','N/A')
+        stateData['weekly_new_cases_per10m'] = item.get('weekly_new_cases_per10m',
+                                                       latestDailyPositiveTweetsCount[0]['weekly_new_cases_per10m'] if counter == 0 else 'N/A')
         stateData['cases_7_sum'] = item.get('cases_7_sum', 'N/A')
         stateData['positivity'] = item.get('positivity', 'N/A')
         # except:
