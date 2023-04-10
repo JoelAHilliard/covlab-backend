@@ -10,6 +10,7 @@ from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 CORS(app)
 
+apiCallCounter = 0
 
 
 load_dotenv()
@@ -45,6 +46,8 @@ def latest():
             latestData['usCases14Day'] = item['cases_14_days_change']
         
 
+    apiCallCounter+=1
+    print("Landing page hit. API Call counter = " + apiCallCounter)
     return json.dumps(latestData)
 
 @app.route('/graphData')
@@ -56,9 +59,11 @@ def grabGraphData():
 
     dataArr = []
 
-    
 
     for data in new_cases_data:
+
+
+        print(data)
         counter += 1
 
         
@@ -130,6 +135,8 @@ def grabGraphData():
     dataObj = [dataArr,tweetArr,stateDataArr]
 
     #json data is  not serializeable
+    print("Graph page hit. API Call counter = " + apiCallCounter)
+
     return json.dumps(dataObj)
  
 @app.route('/graphData1')
@@ -142,6 +149,8 @@ def grabGraphData1():
 
     dataArr = []
     for data in new_cases_data:
+        
+
         
         counter += 1
 
@@ -205,6 +214,7 @@ def getTableData():
     latestStatisticsData = statistics_collection.find()
     stateArr = []
     for counter, item in enumerate(latestStatisticsData):
+        print(item)
         stateData = {"state": item['type']}
         # Update the state data with the matching data from US map, using the state value
         matching_data = next((x["data"] for x in usDataArr if x["state"] == stateData["state"]), [])
@@ -221,6 +231,7 @@ def getTableData():
         
 
         #US Data is missing some entries
+        
         try:
             stateData['weekly_new_cases_per10m'] = item.get('weekly_new_cases_per10m',
                                                        latestDailyPositiveTweetsCount[0]['weekly_new_cases_per10m'] if counter == 0 else 'N/A')
@@ -245,6 +256,8 @@ def getMapData():
             "positive":item['total_count']
         }
         stateDataArr.append(state_data)
+    print("Map page hit. API Call counter = " + apiCallCounter)
+
     return json.dumps(stateDataArr)
 
 @app.route('/wordCloudData')
@@ -260,8 +273,6 @@ def getWordCloudData():
         }
         wordDataArr.append(word_data)
     return json.dumps(wordDataArr)
-
-    return
 
 if __name__ == '__main__':
     app.run(port=5001)
