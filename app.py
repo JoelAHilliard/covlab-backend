@@ -18,8 +18,6 @@ usr = os.getenv("USERNAME")
 username = urllib.parse.quote_plus(str(usr))
 password = urllib.parse.quote_plus(str(pw))
 
-print(username)
-print(password)
 client = pymongo.MongoClient("mongodb://" + username + ":" + password + "@covlab.tech:57017/TwitterVisual")
 
 
@@ -194,11 +192,13 @@ def getTableData():
     # Process data for state table 
     latestStatisticsData = statistics_collection.find()
     stateArr = []
+
     for counter, item in enumerate(latestStatisticsData):
-        print(item)
+    
         stateData = {"state": item['type']}
         # Update the state data with the matching data from US map, using the state value
         matching_data = next((x["data"] for x in usDataArr if x["state"] == stateData["state"]), [])
+    
         stateData['cases_14_days_change'] = {
             "percentage": item.get('cases_14_days_change', 'N/A'),
             "14DayData": {
@@ -219,18 +219,26 @@ def getTableData():
         except:
             print("Key error when getting data, key: weekly_new_cases_per10m")
             stateData['weekly_new_cases_per10m'] = "N/A"
+    
         stateData['cases_7_sum'] = item.get('cases_7_sum', 'N/A')
+    
         stateData['positivity'] = item.get('positivity', 'N/A')
+    
         stateArr.append(stateData)
 
     return json.dumps(stateArr)
 
 @app.route('/mapData')
 def getMapData():
+    
     db = client["TwitterVisual"]
+    
     usd_map_collection = db["us_map"]
+    
     map_data = usd_map_collection.find()
+    
     stateDataArr = []
+    
     for item in map_data:
         state_data = {
             "state":item['state'],
