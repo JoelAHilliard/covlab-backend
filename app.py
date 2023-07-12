@@ -10,9 +10,6 @@ from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 CORS(app)
 
-apiCallCounter = 0
-
-
 load_dotenv()
 
 pw = os.getenv("PASSWORD")
@@ -21,6 +18,8 @@ usr = os.getenv("USERNAME")
 username = urllib.parse.quote_plus(str(usr))
 password = urllib.parse.quote_plus(str(pw))
 
+print(username)
+print(password)
 client = pymongo.MongoClient("mongodb://" + username + ":" + password + "@covlab.tech:57017/TwitterVisual")
 
 
@@ -45,9 +44,6 @@ def latest():
         if(item['type'] == "US"):
             latestData['usCases14Day'] = item['cases_14_days_change']
         
-
-    apiCallCounter+=1
-    print("Landing page hit. API Call counter = " + apiCallCounter)
     return json.dumps(latestData)
 
 @app.route('/graphData')
@@ -55,19 +51,11 @@ def grabGraphData():
     db = client["TwitterVisual"]
     daily_real_data_us_collection = db["daily_real_data_us"]
     new_cases_data = daily_real_data_us_collection.find()
-    counter = 0
 
     dataArr = []
 
-
     for data in new_cases_data:
 
-
-        print(data)
-        counter += 1
-
-        
-    
         dataArr.append({
             "date": data['date'],
             "new_cases": data['new_cases'],
@@ -83,12 +71,10 @@ def grabGraphData():
     
     new_cases_data = daily_positive_tweet_count_collection.find()
     
-    counter = 0
 
     tweetArr = []
     
     for data in new_cases_data:
-        counter += 1
 
         #some db entries are missing some key pairs
         try:
@@ -113,8 +99,6 @@ def grabGraphData():
     
     new_cases_data = daily_positive_tweet_count_collection.find()
 
-    counter = 0
-
 
     stateDataArr = []
     pastData = []
@@ -135,7 +119,6 @@ def grabGraphData():
     dataObj = [dataArr,tweetArr,stateDataArr]
 
     #json data is  not serializeable
-    print("Graph page hit. API Call counter = " + apiCallCounter)
 
     return json.dumps(dataObj)
  
@@ -143,17 +126,15 @@ def grabGraphData():
 def grabGraphData1():
 
     db = client["TwitterVisual"]
+    
     daily_real_data_us_collection = db["daily_all_tweets_count"]
+    
     new_cases_data = daily_real_data_us_collection.find()
-    counter = 0
-
+    
     dataArr = []
+    
     for data in new_cases_data:
         
-
-        
-        counter += 1
-
         #some db entries are missing some key pairs
 
         try:
@@ -256,22 +237,27 @@ def getMapData():
             "positive":item['total_count']
         }
         stateDataArr.append(state_data)
-    print("Map page hit. API Call counter = " + apiCallCounter)
 
     return json.dumps(stateDataArr)
 
 @app.route('/wordCloudData')
 def getWordCloudData():
+    
     db = client["TwitterVisual"]
+    
     word_cloud_collection = db["word_cloud"]
+    
     word_data = word_cloud_collection.find()
+    
     wordDataArr = []
+    
     for item in word_data:
         word_data = {
             "name":item['word'],
             "weight":item['frequency']
         }
         wordDataArr.append(word_data)
+    
     return json.dumps(wordDataArr)
 
 if __name__ == '__main__':
