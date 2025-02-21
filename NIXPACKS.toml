@@ -1,0 +1,12 @@
+[phases.setup]
+pythonVersion = "3.10"
+
+[phases.install]
+aptPkgs = ["build-essential", "python3-dev", "libev-dev"]
+
+[phases.build]
+cmds = [
+  "pip install --upgrade pip setuptools wheel",
+  "pip install --pre gevent",
+  "pip install -r requirements.txt"
+]
