@@ -18,6 +18,7 @@ Jinja2==3.1.2
 MarkupSafe==2.1.2
 pymongo==4.3.3
 PySocks==1.7.1
+python==3.10
 python-dotenv==0.21.1
 requests==2.28.2
 requests-file==1.5.1
